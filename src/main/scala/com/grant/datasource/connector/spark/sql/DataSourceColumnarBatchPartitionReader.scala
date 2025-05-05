@@ -9,7 +9,7 @@ import org.apache.arrow.flight.{FlightClient, Location, Ticket}
 import org.apache.spark.sql.connector.read.PartitionReader
 import org.apache.spark.sql.vectorized.{ArrowColumnVector, ColumnarBatch}
 
-import scala.collection.JavaConverters
+import scala.jdk.CollectionConverters
 
 class DataSourceColumnarBatchPartitionReader(val config: DatastoreConfig, val partition: DataSourceInputPartition) extends PartitionReader[ColumnarBatch]{
 
@@ -48,7 +48,7 @@ class DataSourceColumnarBatchPartitionReader(val config: DatastoreConfig, val pa
   override def get(): ColumnarBatch = {
     val root = sqlStream.getRoot
     new ColumnarBatch(
-      JavaConverters.asScalaBuffer(root.getFieldVectors).map(vector => new ArrowColumnVector(vector)).toArray,
+      CollectionConverters.ListHasAsScala(root.getFieldVectors).asScala.map(vector => new ArrowColumnVector(vector)).toArray,
       root.getRowCount
     )
   }
